@@ -8,6 +8,7 @@ import tech.cyrilcesco.BankAccountKata.account.domain.ports.OperationRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ListOperationRepository implements OperationRepository {
@@ -32,6 +33,9 @@ public class ListOperationRepository implements OperationRepository {
 
     @Override
     public List<Operation> getAllOperationsType(int accountNumber, OperationType operationType) {
-        return null;
+        return operations.stream()
+                .filter((Operation operation) -> operation.getOperationType() == operationType
+                        && accountNumber == operation.getAccount().getId())
+                .collect(Collectors.toList());
     }
 }
