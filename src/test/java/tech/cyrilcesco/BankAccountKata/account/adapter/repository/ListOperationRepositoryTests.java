@@ -4,17 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tech.cyrilcesco.BankAccountKata.account.adapters.repository.ListOperationRepository;
-import tech.cyrilcesco.BankAccountKata.account.domain.model.Account;
-import tech.cyrilcesco.BankAccountKata.account.domain.model.Deposit;
-import tech.cyrilcesco.BankAccountKata.account.domain.model.Operation;
-import tech.cyrilcesco.BankAccountKata.account.domain.model.OperationType;
+import tech.cyrilcesco.BankAccountKata.account.domain.model.*;
 import tech.cyrilcesco.BankAccountKata.account.domain.ports.OperationRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,7 +20,11 @@ class ListOperationRepositoryTests {
     private static final int ID_DEPOSIT_1 = 1;
     private static final int ID_DEPOSIT_2 = 2;
     private static final int ID_DEPOSIT_3 = 3;
+    private static final int ID_WITHDRAWAL_1 = 4;
+    private static final int ID_WITHDRAWAL_2 = 5;
+    private static final int ID_WITHDRAWAL_3 = 6;
     private static final int ID_COMPTE_1 = 1258;
+    private static final int ID_COMPTE_2 = 987654;
 
 
     private static final Deposit DEPOSIT_TO_SAVE = Deposit
@@ -39,7 +39,7 @@ class ListOperationRepositoryTests {
     private static final Deposit DEPOSIT_TO_SAVE_2 = Deposit
             .builder()
             .id(ID_DEPOSIT_2)
-            .account(Account.builder().id(987654).build())
+            .account(Account.builder().id(ID_COMPTE_2).build())
             .date(LocalDate.of(2021, 2, 3))
             .amount(BigDecimal.valueOf(182))
             .accountBalanceAfterOperation(BigDecimal.valueOf(182))
@@ -52,6 +52,33 @@ class ListOperationRepositoryTests {
             .date(LocalDate.of(2021, 3, 2))
             .amount(BigDecimal.valueOf(80))
             .accountBalanceAfterOperation(BigDecimal.valueOf(100))
+            .build();
+
+    private static final Withdrawal WITHDRAWAL_TO_SAVE_1 = Withdrawal
+            .builder()
+            .id(ID_WITHDRAWAL_1)
+            .account(Account.builder().id(ID_COMPTE_1).build())
+            .date(LocalDate.of(2021, 6, 12))
+            .amount(BigDecimal.valueOf(100))
+            .accountBalanceAfterOperation(BigDecimal.valueOf(152))
+            .build();
+
+    private static final Withdrawal WITHDRAWAL_TO_SAVE_2 = Withdrawal
+            .builder()
+            .id(ID_WITHDRAWAL_2)
+            .account(Account.builder().id(ID_COMPTE_2).build())
+            .date(LocalDate.of(2020, 2, 1))
+            .amount(BigDecimal.valueOf(150))
+            .accountBalanceAfterOperation(BigDecimal.valueOf(450))
+            .build();
+
+    private static final Withdrawal WITHDRAWAL_TO_SAVE_3 = Withdrawal
+            .builder()
+            .id(ID_WITHDRAWAL_3)
+            .account(Account.builder().id(ID_COMPTE_1).build())
+            .date(LocalDate.of(2020, 11, 20))
+            .amount(BigDecimal.valueOf(140))
+            .accountBalanceAfterOperation(BigDecimal.valueOf(240))
             .build();
 
     private OperationRepository operationRepository;
@@ -122,5 +149,38 @@ class ListOperationRepositoryTests {
                 operationRepository.getAllOperationsType(ID_COMPTE_1, OperationType.DEPOSIT),
                 Arrays.asList(DEPOSIT_TO_SAVE, DEPOSIT_TO_SAVE_3)
         );
+    }
+
+    @Test
+    void makeWithdrawalInEmptyAccountList() {
+        operationRepository.save(WITHDRAWAL_TO_SAVE_1);
+        Operation operationToCheck = operationRepository.getOperation(ID_WITHDRAWAL_1).get();
+        assertEquals(operationToCheck, WITHDRAWAL_TO_SAVE_1);
+    }
+
+    @Test
+    void makeWithdrawalWithDifferentAccount() {
+        operationRepository.save(WITHDRAWAL_TO_SAVE_1);
+        operationRepository.save(WITHDRAWAL_TO_SAVE_2);
+        Operation operationToCheck = operationRepository.getOperation(ID_WITHDRAWAL_1).get();
+        assertEquals(operationToCheck, WITHDRAWAL_TO_SAVE_1);
+    }
+
+    @Test
+    void makeWithdrawalWithSameAccount() {
+        operationRepository.save(WITHDRAWAL_TO_SAVE_3);
+        operationRepository.save(WITHDRAWAL_TO_SAVE_1);
+        Operation operationToCheck = operationRepository.getOperation(ID_WITHDRAWAL_3).get();
+        assertEquals(operationToCheck, WITHDRAWAL_TO_SAVE_3);
+    }
+
+    @Test
+    void makeWithdrawalWithDeposit() {
+        operationRepository.save(WITHDRAWAL_TO_SAVE_3);
+        operationRepository.save(DEPOSIT_TO_SAVE_3);
+        Operation withdrawalToCheck = operationRepository.getOperation(ID_WITHDRAWAL_3).get();
+        assertEquals(withdrawalToCheck, WITHDRAWAL_TO_SAVE_3);
+        Operation depositToCheck = operationRepository.getOperation(ID_DEPOSIT_3).get();
+        assertEquals(depositToCheck, DEPOSIT_TO_SAVE_3);
     }
 }

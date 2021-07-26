@@ -25,6 +25,10 @@ public class OperationApplicationService {
         return operationRepository.save(getOperationWithLastAccountBalanceAmountAdded(lastOperationToGetAccountBalance, operation));
     }
 
+    public Operation withdrawal(Operation operation) {
+        return null;
+    }
+
     private Operation getOperationWithLastAccountBalanceAmountAdded(Operation lastOperation, Operation operationToAdd) {
         BigDecimal accountBalanceAfterOperation = operationToAdd.getAmount().add(lastOperation.getAccountBalanceAfterOperation());
         return operationToAdd.toBuilder().accountBalanceAfterOperation(accountBalanceAfterOperation).build();
