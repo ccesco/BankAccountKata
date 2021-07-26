@@ -7,10 +7,14 @@ import tech.cyrilcesco.BankAccountKata.account.adapters.repository.ListOperation
 import tech.cyrilcesco.BankAccountKata.account.domain.model.Account;
 import tech.cyrilcesco.BankAccountKata.account.domain.model.Deposit;
 import tech.cyrilcesco.BankAccountKata.account.domain.model.Operation;
+import tech.cyrilcesco.BankAccountKata.account.domain.model.OperationType;
 import tech.cyrilcesco.BankAccountKata.account.domain.ports.OperationRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -80,5 +84,43 @@ class ListOperationRepositoryTests {
         assertEquals(operationToCheck, DEPOSIT_TO_SAVE);
         assertEquals(operationToCheck.getAccountBalanceAfterOperation(),
                 DEPOSIT_TO_SAVE_3.getAccountBalanceAfterOperation().add(DEPOSIT_TO_SAVE.getAmount()));
+    }
+
+    @Test
+    void getAllOperationsTypeDepositEmpty() {
+        assertEquals(
+                operationRepository.getAllOperationsType(ID_COMPTE_1, OperationType.DEPOSIT),
+                new ArrayList<>()
+        );
+    }
+
+    @Test
+    void getAllOperationsTypeDepositOneElement() {
+        operationRepository.save(DEPOSIT_TO_SAVE);
+        assertEquals(
+                operationRepository.getAllOperationsType(ID_COMPTE_1, OperationType.DEPOSIT),
+                Arrays.asList(DEPOSIT_TO_SAVE)
+        );
+    }
+
+    @Test
+    void getAllOperationsTypeDepositTwoElement() {
+        operationRepository.save(DEPOSIT_TO_SAVE);
+        operationRepository.save(DEPOSIT_TO_SAVE_3);
+        assertEquals(
+                operationRepository.getAllOperationsType(ID_COMPTE_1, OperationType.DEPOSIT),
+                Arrays.asList(DEPOSIT_TO_SAVE, DEPOSIT_TO_SAVE_3)
+        );
+    }
+
+    @Test
+    void getAllOperationsTypeDepositDifferentAccount() {
+        operationRepository.save(DEPOSIT_TO_SAVE);
+        operationRepository.save(DEPOSIT_TO_SAVE_2);
+        operationRepository.save(DEPOSIT_TO_SAVE_3);
+        assertEquals(
+                operationRepository.getAllOperationsType(ID_COMPTE_1, OperationType.DEPOSIT),
+                Arrays.asList(DEPOSIT_TO_SAVE, DEPOSIT_TO_SAVE_3)
+        );
     }
 }
