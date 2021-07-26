@@ -28,7 +28,8 @@ public class ListOperationRepository implements OperationRepository {
 
     @Override
     public List<Operation> getAllOperations(int accountNumber) {
-        return null;
+        // TODO modifier une fois un autre type d'opération
+        return getAllOperationsType(accountNumber, OperationType.DEPOSIT);
     }
 
     @Override
