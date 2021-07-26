@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @FieldDefaults(level= AccessLevel.PRIVATE)
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Getter
 public class Operation {
     int id;

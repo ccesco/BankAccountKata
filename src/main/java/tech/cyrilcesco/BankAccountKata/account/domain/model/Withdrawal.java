@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class Withdrawal extends Operation {
 
     @Builder.Default
