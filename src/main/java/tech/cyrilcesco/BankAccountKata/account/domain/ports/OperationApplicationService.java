@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class OperationApplicationService {
@@ -26,7 +27,9 @@ public class OperationApplicationService {
     }
 
     public List<Operation> getOperationListOrdered(int accountId) {
-        return null;
+        return operationRepository.getAllOperations(accountId).stream()
+                .sorted(Comparator.comparing(Operation::getDate))
+                .collect(Collectors.toList());
     }
 
     private Operation getOperationWithLastAccountBalanceAmountAdded(Operation lastOperation, Operation operationToAdd) {
