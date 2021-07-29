@@ -5,6 +5,7 @@ import tech.cyrilcesco.BankAccountKata.account.domain.model.Operation;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -22,6 +23,10 @@ public class OperationApplicationService {
 
     public Operation withdrawal(Operation operation) {
         return operationRepository.save(getOperationWithLastAccountBalanceAmountSubstract(getLastOperation(operation), operation));
+    }
+
+    public List<Operation> getOperationListOrdered(int accountId) {
+        return null;
     }
 
     private Operation getOperationWithLastAccountBalanceAmountAdded(Operation lastOperation, Operation operationToAdd) {
