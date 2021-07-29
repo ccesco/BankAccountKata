@@ -28,15 +28,19 @@ public class ListOperationRepository implements OperationRepository {
 
     @Override
     public List<Operation> getAllOperations(int accountNumber) {
-        // TODO modifier une fois un autre type d'opération
-        return getAllOperationsType(accountNumber, OperationType.DEPOSIT);
+        return getAllOperationForAccountId(accountNumber);
     }
 
     @Override
     public List<Operation> getAllOperationsType(int accountNumber, OperationType operationType) {
+        return getAllOperationForAccountId(accountNumber).stream()
+                .filter((Operation operation) -> operation.getOperationType() == operationType)
+                .collect(Collectors.toList());
+    }
+
+    private List<Operation> getAllOperationForAccountId(int accountNumber) {
         return operations.stream()
-                .filter((Operation operation) -> operation.getOperationType() == operationType
-                        && accountNumber == operation.getAccount().getId())
+                .filter((Operation operation) -> accountNumber == operation.getAccount().getId())
                 .collect(Collectors.toList());
     }
 }

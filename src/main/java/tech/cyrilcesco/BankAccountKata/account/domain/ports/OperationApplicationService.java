@@ -17,20 +17,28 @@ public class OperationApplicationService {
     }
 
     public Operation deposit(Operation operation) {
-        Operation lastOperationToGetAccountBalance =
-                operationRepository.getAllOperations(operation.getAccount().getId()).stream()
-                        .filter(Objects::nonNull)
-                        .max(Comparator.comparing(Operation::getDate))
-                        .orElseGet(() -> Operation.builder().accountBalanceAfterOperation(BigDecimal.ZERO).build());
-        return operationRepository.save(getOperationWithLastAccountBalanceAmountAdded(lastOperationToGetAccountBalance, operation));
+        return operationRepository.save(getOperationWithLastAccountBalanceAmountAdded(getLastOperation(operation), operation));
     }
 
     public Operation withdrawal(Operation operation) {
-        return null;
+        return operationRepository.save(getOperationWithLastAccountBalanceAmountSubstract(getLastOperation(operation), operation));
     }
 
     private Operation getOperationWithLastAccountBalanceAmountAdded(Operation lastOperation, Operation operationToAdd) {
         BigDecimal accountBalanceAfterOperation = operationToAdd.getAmount().add(lastOperation.getAccountBalanceAfterOperation());
         return operationToAdd.toBuilder().accountBalanceAfterOperation(accountBalanceAfterOperation).build();
+    }
+
+    private Operation getOperationWithLastAccountBalanceAmountSubstract(Operation lastOperation, Operation operationToSubsrtract) {
+        BigDecimal accountBalanceAfterOperation = lastOperation.getAccountBalanceAfterOperation().subtract(operationToSubsrtract.getAmount());
+        return operationToSubsrtract.toBuilder().accountBalanceAfterOperation(accountBalanceAfterOperation).build();
+    }
+
+    private Operation getLastOperation(Operation operation) {
+        return
+                operationRepository.getAllOperations(operation.getAccount().getId()).stream()
+                        .filter(Objects::nonNull)
+                        .max(Comparator.comparing(Operation::getDate))
+                        .orElseGet(() -> Operation.builder().accountBalanceAfterOperation(BigDecimal.ZERO).build());
     }
 }
